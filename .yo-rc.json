@@ -1,0 +1,44 @@
+{
+  "generator-jhipster": {
+    "promptValues": {
+      "packageName": "uz.blog",
+      "nativeLanguage": "en"
+    },
+    "jhipsterVersion": "6.0.1",
+    "applicationType": "monolith",
+    "baseName": "blogDemo",
+    "packageName": "uz.blog",
+    "packageFolder": "uz/blog",
+    "serverPort": "8080",
+    "authenticationType": "jwt",
+    "cacheProvider": "ehcache",
+    "enableHibernateCache": false,
+    "websocket": false,
+    "databaseType": "sql",
+    "devDatabaseType": "postgresql",
+    "prodDatabaseType": "postgresql",
+    "searchEngine": false,
+    "messageBroker": false,
+    "serviceDiscoveryType": false,
+    "buildTool": "maven",
+    "enableSwaggerCodegen": false,
+    "jwtSecretKey": "NDFkZWZmZDk2ODQwZjQyMWE2MmE4MGZkODg2YjRiYzBhMjI4NjExOWJiOTZhZTM2NjcwMzAwYjUzYjRkMTI1YzNkMDRmYWQ5M2YwNDlmYTZhZTRiOGQ0MmJhMTU4MzgxNDNhMTEwZGRjOTljYjQ5ZjFhZTJlMjdmYzEzZmNiOWY=",
+    "clientFramework": "react",
+    "clientTheme": "none",
+    "clientThemeVariant": "",
+    "useSass": true,
+    "clientPackageManager": "npm",
+    "testFrameworks": [],
+    "jhiPrefix": "jhi",
+    "entitySuffix": "",
+    "dtoSuffix": "DTO",
+    "otherModules": [],
+    "enableTranslation": true,
+    "nativeLanguage": "en",
+    "languages": [
+      "en",
+      "ru",
+      "uz-lat"
+    ]
+  }
+}
