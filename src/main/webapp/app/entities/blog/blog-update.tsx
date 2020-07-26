@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link, RouteComponentProps } from 'react-router-dom';
-import { Button, Row, Col, Label } from 'reactstrap';
+import { Button, Row, Col, Label, CustomInput } from 'reactstrap';
 import { AvFeedback, AvForm, AvGroup, AvInput, AvField } from 'availity-reactstrap-validation';
 // tslint:disable-next-line:no-unused-variable
-import { Translate, translate, ICrudGetAction, ICrudGetAllAction, ICrudPutAction } from 'react-jhipster';
+import { Translate, translate } from 'react-jhipster';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IRootState } from 'app/shared/reducers';
 
@@ -13,18 +13,24 @@ import { IBlog } from 'app/shared/model/blog.model';
 // tslint:disable-next-line:no-unused-variable
 import { convertDateTimeFromServer, convertDateTimeToServer } from 'app/shared/util/date-utils';
 import { mapIdList } from 'app/shared/util/entity-utils';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 export interface IBlogUpdateProps extends StateProps, DispatchProps, RouteComponentProps<{ id: string }> {}
 
 export interface IBlogUpdateState {
   isNew: boolean;
+  file: File;
+  loading: boolean;
 }
 
 export class BlogUpdate extends React.Component<IBlogUpdateProps, IBlogUpdateState> {
   constructor(props) {
     super(props);
     this.state = {
-      isNew: !this.props.match.params || !this.props.match.params.id
+      isNew: !this.props.match.params || !this.props.match.params.id,
+      file: null,
+      loading: false
     };
   }
 
@@ -52,21 +58,79 @@ export class BlogUpdate extends React.Component<IBlogUpdateProps, IBlogUpdateSta
         ...values
       };
 
+      const formData = new FormData();
+      formData.append('title', values['title']);
+      formData.append('alias', values['alias']);
+      formData.append('content', values['content']);
+      if (this.state.file) {
+        formData.append('mainImgFile', this.state.file);
+      }
+      const config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      };
+
       if (this.state.isNew) {
-        this.props.createEntity(entity);
+        this.saveBlog(formData, config);
       } else {
-        this.props.updateEntity(entity);
+        formData.append('id', `${this.props.blogEntity.id}`);
+        this.updateBlog(formData, config);
       }
     }
+  };
+
+  saveBlog = (formData, config) => {
+    this.setState({ loading: true });
+    axios
+      .post('api/blogs/create', formData, config)
+      .then(response => {
+        if (response.status === 201) {
+          toast.success(translate('blogDemoApp.blog.createSuccess'));
+          this.handleClose();
+        } else {
+          toast.error(response.data.reason);
+        }
+        this.setState({ loading: false });
+      })
+      .catch(error => {
+        toast.error(error);
+        this.setState({ loading: false });
+      });
+  };
+
+  updateBlog = (formData, config) => {
+    this.setState({ loading: true });
+    axios
+      .post('api/blogs/update', formData, config)
+      .then(response => {
+        if (response.status === 200) {
+          toast.success(translate('blogDemoApp.blog.createSuccess'));
+          this.handleClose();
+        } else {
+          toast.error(response.data.reason);
+        }
+        this.setState({ loading: false });
+      })
+      .catch(error => {
+        toast.error(error);
+        this.setState({ loading: false });
+      });
   };
 
   handleClose = () => {
     this.props.history.push('/entity/blog');
   };
 
+  onFileUploaderChange = event => {
+    this.setState({
+      file: event.target.files[0]
+    });
+  };
+
   render() {
     const { blogEntity, loading, updating } = this.props;
-    const { isNew } = this.state;
+    const defaultFormData = this.state;
 
     return (
       <div>
@@ -82,8 +146,8 @@ export class BlogUpdate extends React.Component<IBlogUpdateProps, IBlogUpdateSta
             {loading ? (
               <p>Loading...</p>
             ) : (
-              <AvForm model={isNew ? {} : blogEntity} onSubmit={this.saveEntity}>
-                {!isNew ? (
+              <AvForm model={defaultFormData.isNew ? {} : blogEntity} onSubmit={this.saveEntity}>
+                {!defaultFormData.isNew ? (
                   <AvGroup>
                     <Label for="blog-id">
                       <Translate contentKey="global.field.id">ID</Translate>
@@ -107,32 +171,19 @@ export class BlogUpdate extends React.Component<IBlogUpdateProps, IBlogUpdateSta
                   <Label id="mainImgLabel" for="blog-mainImg">
                     <Translate contentKey="blogDemoApp.blog.mainImg">Main Img</Translate>
                   </Label>
-                  <AvField id="blog-mainImg" type="text" name="mainImg" />
+                  <CustomInput
+                    type="file"
+                    id="blog-mainImg"
+                    name="mainImg"
+                    label={defaultFormData.file !== null ? defaultFormData.file.name : 'Файл не выбран'}
+                    onChange={this.onFileUploaderChange}
+                  />
                 </AvGroup>
                 <AvGroup>
                   <Label id="contentLabel" for="blog-content">
                     <Translate contentKey="blogDemoApp.blog.content">Content</Translate>
                   </Label>
                   <AvField id="blog-content" type="text" name="content" />
-                </AvGroup>
-                <AvGroup>
-                  <Label id="createdAtLabel" for="blog-createdAt">
-                    <Translate contentKey="blogDemoApp.blog.createdAt">Created At</Translate>
-                  </Label>
-                  <AvInput
-                    id="blog-createdAt"
-                    type="datetime-local"
-                    className="form-control"
-                    name="createdAt"
-                    placeholder={'YYYY-MM-DD HH:mm'}
-                    value={isNew ? null : convertDateTimeFromServer(this.props.blogEntity.createdAt)}
-                  />
-                </AvGroup>
-                <AvGroup>
-                  <Label id="createdByLabel" for="blog-createdBy">
-                    <Translate contentKey="blogDemoApp.blog.createdBy">Created By</Translate>
-                  </Label>
-                  <AvField id="blog-createdBy" type="string" className="form-control" name="createdBy" />
                 </AvGroup>
                 <Button tag={Link} id="cancel-save" to="/entity/blog" replace color="info">
                   <FontAwesomeIcon icon="arrow-left" />

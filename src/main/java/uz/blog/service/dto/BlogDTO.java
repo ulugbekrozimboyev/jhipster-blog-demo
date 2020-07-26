@@ -1,4 +1,7 @@
 package uz.blog.service.dto;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Nullable;
 import java.time.Instant;
 import java.io.Serializable;
 import java.util.Objects;
@@ -15,6 +18,9 @@ public class BlogDTO implements Serializable {
     private String alias;
 
     private String mainImg;
+
+    @Nullable
+    private MultipartFile mainImgFile;
 
     private String content;
 
@@ -77,6 +83,15 @@ public class BlogDTO implements Serializable {
 
     public void setCreatedBy(Long createdBy) {
         this.createdBy = createdBy;
+    }
+
+    @Nullable
+    public MultipartFile getMainImgFile() {
+        return mainImgFile;
+    }
+
+    public void setMainImgFile(@Nullable MultipartFile mainImgFile) {
+        this.mainImgFile = mainImgFile;
     }
 
     @Override

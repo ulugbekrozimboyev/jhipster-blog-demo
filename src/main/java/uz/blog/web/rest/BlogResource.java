@@ -46,14 +46,14 @@ public class BlogResource {
     }
 
     /**
-     * {@code POST  /blogs} : Create a new blog.
+     * {@code POST  /blogs/create} : Create a new blog.
      *
      * @param blogDTO the blogDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new blogDTO, or with status {@code 400 (Bad Request)} if the blog has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/blogs")
-    public ResponseEntity<BlogDTO> createBlog(@RequestBody BlogDTO blogDTO) throws URISyntaxException {
+    @PostMapping("/blogs/create")
+    public ResponseEntity<BlogDTO> createBlog(@ModelAttribute BlogDTO blogDTO) throws Exception {
         log.debug("REST request to save Blog : {}", blogDTO);
         if (blogDTO.getId() != null) {
             throw new BadRequestAlertException("A new blog cannot already have an ID", ENTITY_NAME, "idexists");
@@ -65,7 +65,7 @@ public class BlogResource {
     }
 
     /**
-     * {@code PUT  /blogs} : Updates an existing blog.
+     * {@code POST  /blogs/update} : Updates an existing blog.
      *
      * @param blogDTO the blogDTO to update.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated blogDTO,
@@ -73,13 +73,13 @@ public class BlogResource {
      * or with status {@code 500 (Internal Server Error)} if the blogDTO couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/blogs")
-    public ResponseEntity<BlogDTO> updateBlog(@RequestBody BlogDTO blogDTO) throws URISyntaxException {
+    @PostMapping("/blogs/update")
+    public ResponseEntity<BlogDTO> updateBlog(@ModelAttribute BlogDTO blogDTO) throws Exception {
         log.debug("REST request to update Blog : {}", blogDTO);
         if (blogDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
-        BlogDTO result = blogService.save(blogDTO);
+        BlogDTO result = blogService.update(blogDTO);
         return ResponseEntity.ok()
             .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, blogDTO.getId().toString()))
             .body(result);

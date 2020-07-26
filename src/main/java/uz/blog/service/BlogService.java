@@ -1,5 +1,6 @@
 package uz.blog.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import uz.blog.domain.Blog;
 import uz.blog.repository.BlogRepository;
 import uz.blog.service.dto.BlogDTO;
@@ -12,7 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service Implementation for managing {@link Blog}.
@@ -20,6 +24,9 @@ import java.util.Optional;
 @Service
 @Transactional
 public class BlogService {
+
+    @Value("${upload_path}")
+    private String UPLOAD_PATH;
 
     private final Logger log = LoggerFactory.getLogger(BlogService.class);
 
@@ -38,9 +45,29 @@ public class BlogService {
      * @param blogDTO the entity to save.
      * @return the persisted entity.
      */
-    public BlogDTO save(BlogDTO blogDTO) {
+    public BlogDTO save(BlogDTO blogDTO) throws Exception {
         log.debug("Request to save Blog : {}", blogDTO);
         Blog blog = blogMapper.toEntity(blogDTO);
+
+        String fileName = null;
+        String filePath = null;
+
+        if(blogDTO.getMainImgFile() != null){
+            fileName = blogDTO.getMainImgFile().getOriginalFilename();
+            String prefix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+            String guidFileName = UUID.randomUUID().toString().replace("-", "") + prefix;
+            filePath = UPLOAD_PATH + guidFileName;
+            File file = new File(filePath);
+            try {
+                blogDTO.getMainImgFile().transferTo(file);
+            } catch (IOException e) {
+                throw new Exception("Произошла ошибка при сохранении файла");
+            }
+
+            blog.setMainImg(guidFileName);
+        }
+
+
         blog = blogRepository.save(blog);
         return blogMapper.toDto(blog);
     }
@@ -80,5 +107,47 @@ public class BlogService {
     public void delete(Long id) {
         log.debug("Request to delete Blog : {}", id);
         blogRepository.deleteById(id);
+    }
+
+    /*
+    * update blog
+    * eski faylini o'chirish
+    *
+    * */
+    public BlogDTO update(BlogDTO blogDTO) throws Exception {
+        log.debug("Request to save Blog : {}", blogDTO);
+        Blog blog = blogMapper.toEntity(blogDTO);
+
+
+
+        String fileName = null;
+        String filePath = null;
+        Optional<Blog> optionalOldBlog = blogRepository.findById(blog.getId());
+        if(!optionalOldBlog.isPresent()) {
+            throw new Exception("Blog not found");
+        }
+
+        if(blogDTO.getMainImgFile() != null){
+            fileName = blogDTO.getMainImgFile().getOriginalFilename();
+            String prefix = fileName.substring(fileName.lastIndexOf("."), fileName.length());
+            String guidFileName = UUID.randomUUID().toString().replace("-", "") + prefix;
+            filePath = UPLOAD_PATH + guidFileName;
+            File file = new File(filePath);
+            try {
+                blogDTO.getMainImgFile().transferTo(file);
+            } catch (IOException e) {
+                throw new Exception("Произошла ошибка при сохранении файла");
+            }
+            blog.setMainImg(guidFileName);
+
+           // diskdan o'chiradi
+            File oldFile = new File(UPLOAD_PATH + optionalOldBlog.get().getMainImg());
+            oldFile.delete();
+        } else {
+            blog.setMainImg(optionalOldBlog.get().getMainImg());
+        }
+
+        blog = blogRepository.save(blog);
+        return blogMapper.toDto(blog);
     }
 }

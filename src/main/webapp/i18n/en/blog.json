@@ -20,7 +20,8 @@
       "mainImg": "Main Img",
       "content": "Content",
       "createdAt": "Created At",
-      "createdBy": "Created By"
+      "createdBy": "Created By",
+      "createSuccess": "Blog successfully created"
     }
   }
 }
