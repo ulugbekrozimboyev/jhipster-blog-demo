@@ -1,0 +1,21 @@
+{
+  "blogDemoApp": {
+    "tag": {
+      "home": {
+        "title": "Tags",
+        "createLabel": "Yangi Tag qo`shish",
+        "createOrEditLabel": "Tagni tahrirlash"
+      },
+      "created": "Tag {{ param }} bilan qo`shildi",
+      "updated": "{{ param }}- Tag saqlandi",
+      "deleted": "{{ param }}- Tag o`chirildi",
+      "delete": {
+        "question": "{{ id }}- Tagni o`chirmoqchimisiz? "
+      },
+      "detail": {
+        "title": "Tag"
+      },
+      "name": "Name"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+entity Blog {
+    title String,
+    alias String,
+    mainImg String,
+    content String,
+    createdAt Instant
+    createdBy Long
+}
+
+entity Tag {
+  name String
+}
+
+paginate all with pagination
+
+dto * with mapstruct
+
+service all with serviceClass

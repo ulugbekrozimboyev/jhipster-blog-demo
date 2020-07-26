@@ -1,0 +1,26 @@
+{
+  "blogDemoApp": {
+    "blog": {
+      "home": {
+        "title": "Blogs",
+        "createLabel": "Yangi Blog qo`shish",
+        "createOrEditLabel": "Blogni tahrirlash"
+      },
+      "created": "Blog {{ param }} bilan qo`shildi",
+      "updated": "{{ param }}- Blog saqlandi",
+      "deleted": "{{ param }}- Blog o`chirildi",
+      "delete": {
+        "question": "{{ id }}- Blogni o`chirmoqchimisiz? "
+      },
+      "detail": {
+        "title": "Blog"
+      },
+      "title": "Title",
+      "alias": "Alias",
+      "mainImg": "Main Img",
+      "content": "Content",
+      "createdAt": "Created At",
+      "createdBy": "Created By"
+    }
+  }
+}
